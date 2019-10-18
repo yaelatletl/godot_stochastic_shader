@@ -16,6 +16,7 @@ _global_script_class_icons={
 [application]
 
 config/name="CernansPromise"
+run/main_scene="res://_tests/Terrain/StochasticTest.tscn"
 config/icon="res://icon.png"
 boot_splash/main_loop_type=""
 

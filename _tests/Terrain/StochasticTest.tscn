@@ -1,8 +1,9 @@
-[gd_scene load_steps=12 format=2]
+[gd_scene load_steps=13 format=2]
 
-[ext_resource path="res://Stosomethingmaterial.tres" type="Material" id=1]
+[ext_resource path="res://_tests/Terrain/Stochastic.tres" type="Material" id=1]
 [ext_resource path="res://_tests/Terrain/CloverField.jpg" type="Texture" id=2]
 [ext_resource path="res://_tests/Terrain/CloverField_n.jpg" type="Texture" id=3]
+[ext_resource path="res://Stochastic.gd" type="Script" id=4]
 [ext_resource path="res://_tests/Terrain/Stochastic_Simple.shader" type="Shader" id=6]
 
 [sub_resource type="PlaneMesh" id=1]
@@ -113,6 +114,7 @@ shader_param/noise_texture = SubResource( 6 )
 transform = Transform( 1.96572, 0, 0, 0, 1.96572, 0, 0, 0, 1.96572, 0, 0, 0 )
 mesh = SubResource( 1 )
 material/0 = ExtResource( 1 )
+script = ExtResource( 4 )
 
 [node name="MeshInstance2" type="MeshInstance" parent="."]
 transform = Transform( 1.96572, 0, 0, 0, 1.96572, 0, 0, 0, 1.96572, 3.92387, 0, 0 )

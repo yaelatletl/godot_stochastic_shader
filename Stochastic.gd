@@ -1,36 +1,32 @@
 tool
-extends ShaderMaterial
+extends MeshInstance
+export(Texture) var albedo
 onready var Math = GDNative.new()
 const GAUSSIAN_AVERAGE = 1.0
 const GAUSSIAN_STD = 1.0
 signal Tinv_ready
 signal TInput_ready
 
-func _run():
-	Math.library = preload("res://bin/AvMath.gdnlib")
-	Math.initialize()
-	var input = get_shader_param("texture_albedo")
-	var Tinput = Image.new()
-	Tinput.create(input.get_width(), input.get_height(), false, Image.FORMAT_RGB8)
-	var Tinv = Image.new()
-	Tinv.create(input.get_width(), input.get_height(), false, Image.FORMAT_RGB8)
-	Tinv = ComputeinvT(input, Tinv)
-	Tinput = ComputeTinput(input, Tinput)
-	set_shader_param("texture_albedo_tinv", Tinv)
-	set_shader_param("texture_albedo_input", Tinput)
-
 func _ready():
+	var mat = get_surface_material(0)
 	Math.library = preload("res://bin/AvMath.gdnlib")
 	Math.initialize()
-	var input = get_shader_param("texture_albedo")
+	var input = mat.get_shader_param("texture_albedo")
+	if input == null:
+		input == albedo
 	var Tinput = Image.new()
 	Tinput.create(input.get_width(), input.get_height(), false, Image.FORMAT_RGB8)
 	var Tinv = Image.new()
 	Tinv.create(input.get_width(), input.get_height(), false, Image.FORMAT_RGB8)
+	input = input.get_data()
 	Tinv = ComputeinvT(input, Tinv)
 	Tinput = ComputeTinput(input, Tinput)
-	set_shader_param("texture_albedo_tinv", Tinv)
-	set_shader_param("texture_albedo_input", Tinput)
+	Tinv.save_png("res://tinv.png")
+	Tinput.save_png("res://tinput.png")
+	mat.set_shader_param("texture_albedo_tinv", Tinv)
+	mat.set_shader_param("texture_albedo_input", Tinput)
+	
+
 	
 	
 func Erf( input : float) -> float:
@@ -53,12 +49,13 @@ func invCDF ( U : float , mu : float , sigma : float ) -> float:
 func ComputeTinput ( input : Image ,  T_input : Image )-> Image:
 	# Sort pixels of example image
 	var sortedInputValues:Array ;
-	sortedInputValues.resize ( input . width * input . height );
+	sortedInputValues.resize ( input . get_width() * input . get_height() );
+	input.lock()
 	for y in range(0, input.height):
-		for x in range(0, input.width):
-			sortedInputValues [ y * input . width + x ]. x = x;
-			sortedInputValues [ y * input . width + x ]. y = y;
-			sortedInputValues [ y * input . width + x ]. value = input . get_pixel (x , y);
+		for x in range(0, input.get_width()):
+			sortedInputValues [ y * input . get_width() + x ]. x = x;
+			sortedInputValues [ y * input . get_width() + x ]. y = y;
+			sortedInputValues [ y * input . get_width() + x ]. value = input . get_pixel (x , y);
 
 	sortedInputValues.sort();
 
@@ -77,14 +74,15 @@ func ComputeTinput ( input : Image ,  T_input : Image )-> Image:
 func ComputeinvT ( input : Image , Tinv : Image) -> Image:
 	# Sort pixels of example image
 	var sortedInputValues : Array ;
-	sortedInputValues . resize ( input . width * input . height );
-	for y in range( 0,  input . height):
-		for x in range( 0,  input . width):
-			sortedInputValues [y * input . width + x] = input . get_pixel (x , y );
+	sortedInputValues . resize ( input.get_width() * input .get_height() );
+	input.lock()
+	for y in range( 0,  input . get_height()):
+		for x in range( 0,  input . get_width()):
+			sortedInputValues [y * input . get_width() + x] = input . get_pixel (x , y );
 	sortedInputValues.sort()
-	for i in range(0 ,  Tinv . width):
+	for i in range(0 ,  Tinv . get_width()):
 # Gaussian value in [0 , 1]
-		var G : float = (i + 0.5) / ( Tinv . width );
+		var G : float = (i + 0.5) / ( Tinv . get_width() );
 # Quantile value
 		var U : float = CDF (G , GAUSSIAN_AVERAGE , GAUSSIAN_STD ) ;
 # Find quantile in sorted pixel values
