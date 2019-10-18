@@ -1,7 +1,5 @@
-[gd_resource type="ShaderMaterial" load_steps=7 format=2]
+[gd_resource type="ShaderMaterial" load_steps=5 format=2]
 
-[ext_resource path="res://image_textures/CloverField.jpg" type="Texture" id=1]
-[ext_resource path="res://image_textures/CloverField_n.jpg" type="Texture" id=2]
 [ext_resource path="res://Stochastic.gd" type="Script" id=3]
 
 [sub_resource type="Shader" id=1]
@@ -192,7 +190,5 @@ shader_param/uv2_scale = Vector3( 1, 1, 1 )
 shader_param/uv2_offset = Vector3( 0, 0, 0 )
 shader_param/rt_w = 1.0
 shader_param/rt_h = 1.0
-shader_param/texture_albedo = ExtResource( 1 )
 shader_param/texture_noise = SubResource( 3 )
-shader_param/texture_normal = ExtResource( 2 )
 script = ExtResource( 3 )

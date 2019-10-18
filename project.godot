@@ -8,51 +8,16 @@
 
 config_version=4
 
-_global_script_classes=[ {
-"base": "Position3D",
-"class": "AstarPathPoint",
-"language": "GDScript",
-"path": "res://AstarPathPoint.gd"
-}, {
-"base": "ImmediateGeometry",
-"class": "ToolDraw",
-"language": "GDScript",
-"path": "res://DrawLines.gd"
-}, {
-"base": "Navigation",
-"class": "WorldNavigation",
-"language": "GDScript",
-"path": "res://scripts/Navigation.gd"
-}, {
-"base": "EditorSpatialGizmo",
-"class": "thisgizmo",
-"language": "GDScript",
-"path": "res://addons/PathMaker/MyCustomGizmo.gd"
-} ]
+_global_script_classes=[  ]
 _global_script_class_icons={
-"AstarPathPoint": "",
-"ToolDraw": "",
-"WorldNavigation": "",
-"thisgizmo": ""
+
 }
 
 [application]
 
 config/name="CernansPromise"
-run/main_scene="res://assets/UI/Menu/MainMenu.tscn"
 config/icon="res://icon.png"
 boot_splash/main_loop_type=""
-
-[autoload]
-
-namelist="*res://core/autoload/namelist.gd"
-logg="*res://core/autoload/log.gd"
-options="*res://core/autoload/autoload-options.gd"
-gamestate="*res://core/autoload/gamestate.gd"
-utils="*res://core/autoload/utils.gd"
-debug="*res://core/autoload/debug.gd"
-UIManager="*res://core/autoload/UIManager.gd"
-Input_Map="*res://core/autoload/input_maping.gd"
 
 [compression]
 
@@ -72,7 +37,7 @@ convert_text_resources_to_binary_on_export=true
 
 [editor_plugins]
 
-enabled=PoolStringArray( "CeransDev", "HuePicker" )
+enabled=PoolStringArray(  )
 
 [input]
 
@@ -276,4 +241,3 @@ quality/shadows/filter_mode=2
 quality/filters/use_nearest_mipmap_filter=true
 limits/rendering/max_renderable_elements=60000
 environment/default_clear_color=Color( 0, 0, 0, 1 )
-environment/default_environment="res://default_env.tres"
