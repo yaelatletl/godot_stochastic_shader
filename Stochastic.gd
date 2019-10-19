@@ -54,6 +54,7 @@ func invCDF ( U : float , mu : float , sigma : float ) -> float:
 	return x
 	
 func ComputeTinput ( input : Image ,  T_input : Image )-> Image:
+	print("Enter Tinput computation")
 	# Sort pixels of example image
 	var sortedInputValues:Array ;
 	sortedInputValues.resize ( input . get_width() * input . get_height() );
@@ -79,6 +80,7 @@ func ComputeTinput ( input : Image ,  T_input : Image )-> Image:
 	return T_input
 	
 func ComputeinvT ( input : Image , Tinv : Image) -> Image:
+	print("Enter Tinv computation")
 	# Sort pixels of example image
 	var sortedInputValues : Array ;
 	sortedInputValues . resize ( input.get_width() * input .get_height() );
