@@ -1,8 +1,10 @@
 [gd_resource type="NativeScript" load_steps=2 format=2]
 
-[ext_resource path="res://bin/AvMath.gdnlib" type="GDNativeLibrary" id=1]
+[sub_resource type="GDNativeLibrary" id=1]
+entry/X11.64 = "res://bin/libtest.so"
+dependency/X11.64 = [  ]
 
 [resource]
 resource_name = "StochasticGenerator"
 class_name = "StochasticGenerator"
-library = ExtResource( 1 )
+library = SubResource( 1 )
