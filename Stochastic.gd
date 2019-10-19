@@ -1,19 +1,22 @@
 tool
 extends MeshInstance
 export(Texture) var albedo
-onready var Math = GDNative.new()
+onready var Math = preload("res://bin/AdvancedMath.gdns").new()
+onready var MathLib = GDNative.new()
 const GAUSSIAN_AVERAGE = 1.0
 const GAUSSIAN_STD = 1.0
 signal Tinv_ready
 signal TInput_ready
 
 func _ready():
+	print("initalizing")
 	var mat = get_surface_material(0)
-	Math.library = preload("res://bin/AvMath.gdnlib")
-	Math.initialize()
+	MathLib.library = preload("res://bin/AdvMath.gdnlib")
+	var success = MathLib.initialize()
+	print(success)
 	var input = mat.get_shader_param("texture_albedo")
 	if input == null:
-		input == albedo
+		input = albedo
 	var Tinput = Image.new()
 	Tinput.create(input.get_width(), input.get_height(), false, Image.FORMAT_RGB8)
 	var Tinv = Image.new()
@@ -30,11 +33,15 @@ func _ready():
 	
 	
 func Erf( input : float) -> float:
-	var res : float  = Math.call_native("float", "erf", [input])
+#	var res : float  = MathLib.call_native("float", "erf", [input])
+	var res = Math.erf(input)
+	print(res)
 	return res
 	
 func ErfInv( input : float) -> float:
-	var res : float  = Math.call_native("float", "inverf", [input])
+#	var res : float  = MathLib.call_native("float", "inverf", [input])
+	var res = Math.inverf(input)
+	print(res)
 	return res
 
 

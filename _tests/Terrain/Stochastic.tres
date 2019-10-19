@@ -1,6 +1,7 @@
-[gd_resource type="ShaderMaterial" load_steps=5 format=2]
+[gd_resource type="ShaderMaterial" load_steps=6 format=2]
 
 [ext_resource path="res://_tests/Terrain/CloverField.jpg" type="Texture" id=1]
+[ext_resource path="res://_tests/Terrain/CloverField.bmp" type="Texture" id=3]
 
 [sub_resource type="Shader" id=1]
 code = "shader_type spatial;
@@ -190,7 +191,7 @@ shader_param/uv2_scale = Vector3( 1, 1, 1 )
 shader_param/uv2_offset = Vector3( 0, 0, 0 )
 shader_param/rt_w = 1.0
 shader_param/rt_h = 1.0
-shader_param/texture_albedo = ExtResource( 1 )
+shader_param/texture_albedo = ExtResource( 3 )
 shader_param/texture_albedo_input = ExtResource( 1 )
 shader_param/texture_albedo_tinv = ExtResource( 1 )
 shader_param/texture_noise = SubResource( 3 )
