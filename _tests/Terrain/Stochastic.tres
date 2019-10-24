@@ -1,7 +1,9 @@
-[gd_resource type="ShaderMaterial" load_steps=6 format=2]
+[gd_resource type="ShaderMaterial" load_steps=8 format=2]
 
-[ext_resource path="res://_tests/Terrain/CloverField.jpg" type="Texture" id=1]
+[ext_resource path="res://tinv.png" type="Texture" id=1]
+[ext_resource path="res://Tin.png" type="Texture" id=2]
 [ext_resource path="res://_tests/Terrain/CloverField.bmp" type="Texture" id=3]
+[ext_resource path="res://_tests/Terrain/CloverField_n.jpg" type="Texture" id=4]
 
 [sub_resource type="Shader" id=1]
 code = "shader_type spatial;
@@ -70,7 +72,7 @@ vec2 hash2D2D (vec2 s)
     return fract(sin(mod(vec2(dot(s, vec2(127.1,311.7)), dot(s, vec2(269.5,183.3))), 3.14159))*43758.5453);
 }
 
-vec3 ProceduralTilingAndBlending (sampler2D input, sampler2D T_input, sampler2D Tinv,  vec2 uv )
+vec3 ProceduralTilingAndBlending (sampler2D input,   vec2 uv )
 {
 // Get triangle info
 float w1 , w2 , w3 ;
@@ -87,21 +89,17 @@ vec2 duvdy = dFdy ( uv ) ;
 vec3 I1 = textureGrad ( input , uv1 , duvdx , duvdy ). rgb ;
 vec3 I2 = textureGrad ( input , uv2 , duvdx , duvdy ). rgb ;
 vec3 I3 = textureGrad ( input , uv3 , duvdx , duvdy ). rgb ;
-// Sample Gaussian values from transformed input
-vec3 G1 = textureGrad ( T_input , uv1 , duvdx , duvdy ) . rgb ;
-vec3 G2 = textureGrad ( T_input , uv2 , duvdx , duvdy ) . rgb ;
-vec3 G3 = textureGrad ( T_input , uv3 , duvdx , duvdy ) . rgb ;
 // Variance - preserving blending
-vec3 G = w1 * G1 + w2 * G2 + w3 * G3 ;
-G = G - vec3 (0.5) ;
+vec3 G;
+vec3 I = w1 * I1 + w2 * I2 + w3 * I3 ;
+G = I - vec3 (0.5) ;
 G = G * inversesqrt ( w1 * w1 + w2 * w2 + w3 * w3 ) ;
 G = G + vec3 (0.5) ;
-// Fetch LUT
-vec3 color ;
-color .r = texture ( Tinv , vec2 (G.r , 0) ).r;
-color .g = texture ( Tinv , vec2 (G.g , 0) ).g;
-color .b = texture ( Tinv , vec2 (G.b , 0) ).b;
-return color;
+vec3 grayXfer = vec3(0.3, 0.59, 0.11);
+vec3 gray = vec3(dot(grayXfer, G));
+G = mix(G, gray, 0.5);
+
+return mix(I,G,0.4);
 }
  
 //stochastic sampling
@@ -134,12 +132,10 @@ vec4 textureStochastic(sampler2D tex, vec2 uv)
            textureGrad(tex, uv + hash2D2D(BW_vx[2].xy), dx, dy) * BW_vx[3].z);
 	
 }
-float aastep(float threshold, float value){
-	float afwidth = length(vec2(dFdx(value), dFdy(value))) * 0.70710678118654757;
-	return smoothstep(threshold-afwidth, threshold+afwidth, value);
-}
-vec4 textureaa(vec4 input, float threshold){
-	return vec4(aastep(threshold, input.x), aastep(threshold, input.y), aastep(threshold, input.z), aastep(threshold, input.a));
+vec4 STexComplexB(sampler2D input, vec2 uv){
+	vec4 tex = vec4(ProceduralTilingAndBlending(input, uv),1);
+	tex = mix(tex, textureStochastic(input, uv), 0.4);
+	return tex;
 }
 
 void vertex() {
@@ -152,11 +148,11 @@ void vertex() {
 void fragment() {
 	vec2 base_uv = UV;
 	vec4 noise = texture(texture_noise, UV);//, dFdx(UV), dFdy(UV));
-	//vec4 albedo_tex = mix(textureStochastic(texture_albedo,base_uv), textureStochastic(texture_albedo, base_uv+vec2(10,5)), noise);
-	vec4 albedo_tex = vec4(ProceduralTilingAndBlending(texture_albedo, texture_albedo_input, texture_albedo_tinv, base_uv),1);
+	vec4 albedo_tex = STexComplexB(texture_albedo, base_uv);
+	
 	
 	float f = albedo_tex.x*8.0;
-	//albedo_tex = mix( albedo_tex_a, albedo_tex_b, smoothstep(0.2,0.8,f-0.1*(albedo_tex_a-albedo_tex_b)));
+
 	
 	ALBEDO = albedo.rgb * albedo_tex.rgb;
 	float metallic_tex = dot(textureStochastic(texture_metallic,base_uv),metallic_texture_channel);
@@ -164,7 +160,7 @@ void fragment() {
 	float roughness_tex = dot(textureStochastic(texture_roughness,base_uv),roughness_texture_channel);
 	ROUGHNESS = roughness_tex * roughness;
 	SPECULAR = specular;
-	NORMALMAP = mix(textureStochastic(texture_normal,base_uv),textureStochastic(texture_normal,base_uv+vec2(10,5)), noise).rgb;
+	NORMALMAP = (STexComplexB(texture_normal, base_uv)/1.3).rgb;
 	NORMALMAP_DEPTH = normal_scale;
 }
 "
@@ -185,13 +181,14 @@ shader_param/point_size = 1.0
 shader_param/metallic_texture_channel = Plane( 1, 0, 0, 0 )
 shader_param/roughness_texture_channel = Plane( 1, 0, 0, 0 )
 shader_param/normal_scale = 1.0
-shader_param/uv1_scale = Vector3( 3, 3, 3 )
+shader_param/uv1_scale = Vector3( 10, 10, 10 )
 shader_param/uv1_offset = Vector3( 0, 0, 0 )
 shader_param/uv2_scale = Vector3( 1, 1, 1 )
 shader_param/uv2_offset = Vector3( 0, 0, 0 )
 shader_param/rt_w = 1.0
 shader_param/rt_h = 1.0
 shader_param/texture_albedo = ExtResource( 3 )
-shader_param/texture_albedo_input = ExtResource( 1 )
+shader_param/texture_albedo_input = ExtResource( 2 )
 shader_param/texture_albedo_tinv = ExtResource( 1 )
 shader_param/texture_noise = SubResource( 3 )
+shader_param/texture_normal = ExtResource( 4 )
